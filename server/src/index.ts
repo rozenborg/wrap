@@ -4,6 +4,7 @@ import cors from "cors";
 import { generateImage } from "./image.js";
 import { webSearch } from "./search.js";
 import { fetchUrlAsImage } from "./fetchUrl.js";
+import { research, type ResearchProvider } from "./research.js";
 
 const app = express();
 app.use(cors());
@@ -14,10 +15,33 @@ app.get("/api/health", (_req, res) => {
     ok: true,
     providers: {
       openai: Boolean(process.env.OPENAI_API_KEY),
+      anthropic: Boolean(process.env.ANTHROPIC_API_KEY),
       replicate: Boolean(process.env.REPLICATE_API_TOKEN),
       brave: Boolean(process.env.BRAVE_SEARCH_API_KEY),
     },
   });
+});
+
+app.post("/api/research-image", async (req, res) => {
+  try {
+    const { brief, researchProvider, imageProvider } = req.body ?? {};
+    if (!brief || typeof brief !== "string") {
+      return res.status(400).json({ error: "brief is required" });
+    }
+    const rp: ResearchProvider = researchProvider === "anthropic" ? "anthropic" : "openai";
+    const researchResult = await research(brief, rp);
+    if (!researchResult.imagePrompt) {
+      return res.status(502).json({ error: "research returned no image prompt" });
+    }
+    const image = await generateImage({
+      prompt: researchResult.imagePrompt,
+      provider: imageProvider,
+    });
+    res.json({ research: researchResult, image });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "research failed";
+    res.status(500).json({ error: message });
+  }
 });
 
 app.post("/api/image", async (req, res) => {

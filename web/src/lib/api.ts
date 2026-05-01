@@ -51,8 +51,48 @@ export async function fetchImageFromUrl(url: string): Promise<string> {
 
 export async function getHealth(): Promise<{
   ok: boolean;
-  providers: { openai: boolean; replicate: boolean; brave: boolean };
+  providers: {
+    openai: boolean;
+    anthropic: boolean;
+    replicate: boolean;
+    brave: boolean;
+  };
 }> {
   const res = await fetch("/api/health");
   return res.json();
+}
+
+export type ResearchProvider = "openai" | "anthropic";
+
+export interface ResearchSource {
+  url: string;
+  title: string;
+}
+
+export interface ResearchImageResponse {
+  research: {
+    summary: string;
+    imagePrompt: string;
+    sources: ResearchSource[];
+    provider: ResearchProvider;
+    model: string;
+  };
+  image: GenerateImageResponse;
+}
+
+export async function researchImage(
+  brief: string,
+  researchProvider: ResearchProvider,
+  imageProvider: Provider
+): Promise<ResearchImageResponse> {
+  const res = await fetch("/api/research-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ brief, researchProvider, imageProvider }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(err.error ?? `research failed (${res.status})`);
+  }
+  return (await res.json()) as ResearchImageResponse;
 }

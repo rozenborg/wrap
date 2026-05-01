@@ -175,35 +175,63 @@ export default function ReferencesPanel() {
           </div>
         )}
         <div className="grid grid-cols-2 gap-1">
-          {refs.map((r) => (
-            <div key={r.id} className="group relative aspect-square overflow-hidden rounded border border-line">
-              <img src={r.src} alt={r.label ?? ""} className="h-full w-full object-cover" />
-              <div className="absolute inset-x-0 bottom-0 flex justify-between gap-1 bg-black/70 p-1 opacity-0 group-hover:opacity-100">
-                <button
-                  onClick={() => dropToCanvas(r.src, r.label ?? "Reference")}
-                  className="rounded bg-accent px-1 text-[10px] text-white"
-                >
-                  Use
-                </button>
-                <button
-                  onClick={() => removeReference(r.id)}
-                  className="rounded bg-white/10 px-1 text-[10px] text-white"
-                >
-                  ✕
-                </button>
-              </div>
-              {r.sourceUrl && (
+          {refs.map((r) => {
+            if (!r.src) {
+              return (
                 <a
+                  key={r.id}
                   href={r.sourceUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="absolute right-1 top-1 rounded bg-black/60 px-1 text-[10px] text-white/80"
+                  className="group relative flex aspect-square flex-col justify-between rounded border border-line bg-ink/60 p-2 hover:border-accent"
+                  title={r.sourceUrl}
                 >
-                  ↗
+                  <span className="line-clamp-3 text-[10px] leading-tight text-white/80">
+                    {r.label ?? r.sourceUrl}
+                  </span>
+                  <span className="text-[10px] text-accent">↗ source</span>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      removeReference(r.id);
+                    }}
+                    className="absolute right-1 top-1 rounded bg-white/10 px-1 text-[10px] text-white opacity-0 group-hover:opacity-100"
+                  >
+                    ✕
+                  </button>
                 </a>
-              )}
-            </div>
-          ))}
+              );
+            }
+            return (
+              <div key={r.id} className="group relative aspect-square overflow-hidden rounded border border-line">
+                <img src={r.src} alt={r.label ?? ""} className="h-full w-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 flex justify-between gap-1 bg-black/70 p-1 opacity-0 group-hover:opacity-100">
+                  <button
+                    onClick={() => dropToCanvas(r.src, r.label ?? "Reference")}
+                    className="rounded bg-accent px-1 text-[10px] text-white"
+                  >
+                    Use
+                  </button>
+                  <button
+                    onClick={() => removeReference(r.id)}
+                    className="rounded bg-white/10 px-1 text-[10px] text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+                {r.sourceUrl && (
+                  <a
+                    href={r.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="absolute right-1 top-1 rounded bg-black/60 px-1 text-[10px] text-white/80"
+                  >
+                    ↗
+                  </a>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -26,7 +26,13 @@ template, AI image generation, web-search references, and a live 3D preview.
   official Tesla UV template (toggle visibility / opacity).
 - **AI image generation** — OpenAI **gpt-image-2** by default, switchable to
   Replicate Flux for cheaper iteration. Add results as a layer or as a reference.
-- **References** — drop image files, paste from URL, or web-search via Brave.
+- **Research mode** — describe a subject in plain English ("look up what a
+  Japanese police car looks like and make it into a wrap"). The model
+  (OpenAI gpt-4.1 or Claude) searches the web, writes a detailed image-gen
+  prompt informed by what it found, then generates the wrap. Source links are
+  added to your References panel automatically.
+- **References** — drop image files, paste from URL, web-search via Brave, or
+  let Research mode populate them with cited sources.
 - **3D preview** — orbit around a stylized Model 3 with your design wrapped
   onto the body, updated live as you edit. Drop in a real `model3.glb` for a
   faithful preview.
@@ -53,9 +59,10 @@ Open <http://localhost:5173>.
 
 | Var | Required | Notes |
 |---|---|---|
-| `OPENAI_API_KEY` | for default provider | uses model `gpt-image-2` (override with `OPENAI_IMAGE_MODEL`) |
-| `REPLICATE_API_TOKEN` | optional | cheaper alternative; defaults to `black-forest-labs/flux-schnell` |
-| `BRAVE_SEARCH_API_KEY` | optional | enables the web-search reference panel (2k free queries/mo) |
+| `OPENAI_API_KEY` | for default provider | image model `gpt-image-2` (override with `OPENAI_IMAGE_MODEL`); research model `gpt-4.1` with `web_search` tool (override with `OPENAI_RESEARCH_MODEL`) |
+| `ANTHROPIC_API_KEY` | optional | enables Claude as a research provider (uses Claude's `web_search` tool); model defaults to `claude-opus-4-7`, override with `ANTHROPIC_RESEARCH_MODEL` |
+| `REPLICATE_API_TOKEN` | optional | cheaper image-gen alternative; defaults to `black-forest-labs/flux-schnell` |
+| `BRAVE_SEARCH_API_KEY` | optional | only needed for the manual image-search panel — Research mode uses OpenAI/Claude `web_search` and does **not** require this |
 | `PORT` | optional | server port, default `8787` |
 
 The provider switch in the AI panel hides options whose keys are missing.
