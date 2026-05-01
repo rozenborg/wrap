@@ -8,3 +8,4 @@ build/
 .vite/
 .cache/
 coverage/
+*.tsbuildinfo
